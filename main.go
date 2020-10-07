@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/redhat-cop/dynamic-rbac-operator/helpers"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -32,9 +31,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"github.com/redhat-cop/dynamic-rbac-operator/helpers"
+
+	crdv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+
 	rbacv1alpha1 "github.com/redhat-cop/dynamic-rbac-operator/api/v1alpha1"
 	"github.com/redhat-cop/dynamic-rbac-operator/controllers"
-	crdv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -88,6 +90,14 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DynamicRole")
+		os.Exit(1)
+	}
+	if err = (&controllers.DynamicClusterRoleReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("DynamicClusterRole"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DynamicClusterRole")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

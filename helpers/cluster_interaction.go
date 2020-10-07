@@ -52,10 +52,10 @@ func CreateOrUpdateRole(role *v1.Role, c client.Client) (err error) {
 	return nil
 }
 
-// CreateOrUpdateClusterRole ensures that a role exists in the specified state in the cluster, whether it has to be created or updated to ensure that
-func CreateOrUpdateClusterRole(role *v1.Role, c client.Client) (err error) {
+// CreateOrUpdateClusterRole ensures that a clusterrole exists in the specified state in the cluster, whether it has to be created or updated to ensure that
+func CreateOrUpdateClusterRole(role *v1.ClusterRole, c client.Client) (err error) {
 	found := &v1.ClusterRole{}
-	err = c.Get(context.TODO(), types.NamespacedName{Name: role.Name, Namespace: role.Namespace}, found)
+	err = c.Get(context.TODO(), types.NamespacedName{Name: role.Name}, found)
 
 	if found != nil && errors.IsNotFound(err) {
 		err = c.Create(context.TODO(), role)

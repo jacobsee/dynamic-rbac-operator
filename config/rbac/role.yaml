@@ -9,6 +9,26 @@ rules:
 - apiGroups:
   - rbac.redhatcop.redhat.io
   resources:
+  - dynamicclusterroles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.redhatcop.redhat.io
+  resources:
+  - dynamicclusterroles/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - rbac.redhatcop.redhat.io
+  resources:
   - dynamicroles
   verbs:
   - create

@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.3.0
   creationTimestamp: null
-  name: dynamicroles.rbac.redhatcop.redhat.io
+  name: dynamicclusterroles.rbac.redhatcop.redhat.io
 spec:
   group: rbac.redhatcop.redhat.io
   names:
-    kind: DynamicRole
-    listKind: DynamicRoleList
-    plural: dynamicroles
-    singular: dynamicrole
-  scope: Namespaced
+    kind: DynamicClusterRole
+    listKind: DynamicClusterRoleList
+    plural: dynamicclusterroles
+    singular: dynamicclusterrole
+  scope: Cluster
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: DynamicRole is the Schema for the dynamicroles API
+      description: DynamicClusterRole is the Schema for the dynamicclusterroles API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,7 +34,7 @@ spec:
         metadata:
           type: object
         spec:
-          description: DynamicRoleSpec defines the desired state of DynamicRole
+          description: DynamicClusterRoleSpec defines the desired state of DynamicClusterRole
           properties:
             allow:
               items:
@@ -151,7 +151,7 @@ spec:
               type: array
           type: object
         status:
-          description: DynamicRoleStatus defines the observed state of DynamicRole
+          description: DynamicClusterRoleStatus defines the observed state of DynamicClusterRole
           type: object
       type: object
   version: v1alpha1

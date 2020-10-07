@@ -34,21 +34,21 @@ import (
 	"github.com/redhat-cop/dynamic-rbac-operator/helpers"
 )
 
-// DynamicRoleReconciler reconciles a DynamicRole object
-type DynamicRoleReconciler struct {
+// DynamicClusterRoleReconciler reconciles a DynamicClusterRole object
+type DynamicClusterRoleReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=rbac.redhatcop.redhat.io,resources=dynamicroles,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=rbac.redhatcop.redhat.io,resources=dynamicroles/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=rbac.redhatcop.redhat.io,resources=dynamicclusterroles,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=rbac.redhatcop.redhat.io,resources=dynamicclusterroles/status,verbs=get;update;patch
 
-func (r *DynamicRoleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *DynamicClusterRoleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
-	_ = r.Log.WithValues("dynamicrole", req.NamespacedName)
+	_ = r.Log.WithValues("dynamicclusterrole", req.NamespacedName)
 
-	instance := &rbacv1alpha1.DynamicRole{}
+	instance := &rbacv1alpha1.DynamicClusterRole{}
 	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -59,19 +59,18 @@ func (r *DynamicRoleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return reconcile.Result{}, err
 	}
 
-	return ReconcileDynamicRole(instance, r.Client, r.Scheme, r.Log)
+	return ReconcileDynamicClusterRole(instance, r.Client, r.Scheme, r.Log)
 }
 
-func ReconcileDynamicRole(dynamicRole *rbacv1alpha1.DynamicRole, client client.Client, scheme *runtime.Scheme, logger logr.Logger) (ctrl.Result, error) {
-	rules, err := helpers.BuildPolicyRules(client, helpers.Role, dynamicRole.Namespace, dynamicRole.Spec.Inherit, dynamicRole.Spec.Allow, dynamicRole.Spec.Deny)
+func ReconcileDynamicClusterRole(dynamicClusterRole *rbacv1alpha1.DynamicClusterRole, client client.Client, scheme *runtime.Scheme, logger logr.Logger) (ctrl.Result, error) {
+	rules, err := helpers.BuildPolicyRules(client, helpers.ClusterRole, "", dynamicClusterRole.Spec.Inherit, dynamicClusterRole.Spec.Allow, dynamicClusterRole.Spec.Deny)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	outputRole := &v1.Role{
+	outputRole := &v1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      dynamicRole.Name,
-			Namespace: dynamicRole.Namespace,
+			Name: dynamicClusterRole.Name,
 			Annotations: map[string]string{
 				"managed-by": "dynamic-rbac-operator",
 			},
@@ -79,13 +78,13 @@ func ReconcileDynamicRole(dynamicRole *rbacv1alpha1.DynamicRole, client client.C
 		Rules: *rules,
 	}
 
-	if err := controllerutil.SetControllerReference(dynamicRole, outputRole, scheme); err != nil {
+	if err := controllerutil.SetControllerReference(dynamicClusterRole, outputRole, scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	logger.Info(fmt.Sprintf("Computed role with %d rules.", len(outputRole.Rules)))
 	logger.Info("Creating or Updating Role")
-	err = helpers.CreateOrUpdateRole(outputRole, client)
+	err = helpers.CreateOrUpdateClusterRole(outputRole, client)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -93,8 +92,8 @@ func ReconcileDynamicRole(dynamicRole *rbacv1alpha1.DynamicRole, client client.C
 	return reconcile.Result{}, nil
 }
 
-func (r *DynamicRoleReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *DynamicClusterRoleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&rbacv1alpha1.DynamicRole{}).
+		For(&rbacv1alpha1.DynamicClusterRole{}).
 		Complete(r)
 }

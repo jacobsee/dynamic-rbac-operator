@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/jinzhu/copier"
@@ -13,33 +14,58 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+type RoleType int
+
+const (
+	Role RoleType = iota
+	ClusterRole
+)
+
 // BuildPolicyRules takes an inherited role, an allow list, and a deny list; and processes everything into a list of policy rules
-func BuildPolicyRules(client client.Client, forNamespace string, inherit *v1alpha1.InheritedRole, allow *[]v1.PolicyRule, deny *[]v1.PolicyRule) (*[]v1.PolicyRule, error) {
+func BuildPolicyRules(client client.Client, roleType RoleType, forNamespace string, inherit *[]v1alpha1.InheritedRole, allow *[]v1.PolicyRule, deny *[]v1.PolicyRule) (*[]v1.PolicyRule, error) {
 	rules := []v1.PolicyRule{}
 
 	if inherit != nil {
-		switch inherit.Kind {
-		case "ClusterRole":
-			inheritedClusterRole := &v1.ClusterRole{}
-			clusterRoleNamespacedName := types.NamespacedName{Name: inherit.Name}
-			err := client.Get(context.TODO(), clusterRoleNamespacedName, inheritedClusterRole)
-			if err != nil {
-				return nil, err
+		if len(*inherit) != 1 {
+			// TODO: multi-role inheritance, merging policies, etc.
+			return nil, errors.New("this operator only supports one inherited role right now")
+		}
+		for _, roleToInherit := range *inherit {
+			switch roleToInherit.Kind {
+			case "ClusterRole":
+				inheritedClusterRole := &v1.ClusterRole{}
+				clusterRoleNamespacedName := types.NamespacedName{Name: roleToInherit.Name}
+				err := client.Get(context.TODO(), clusterRoleNamespacedName, inheritedClusterRole)
+				if err != nil {
+					return nil, err
+				}
+				// nonResourceURLs do not make sense to move from a ClusterRole to a Role
+				var enumeratedPolicyRules []v1.PolicyRule
+				if roleType == Role {
+					enumeratedPolicyRules, err = EnumeratePolicyRules(StripNonResourceURLs(inheritedClusterRole.Rules))
+				} else {
+					enumeratedPolicyRules, err = EnumeratePolicyRules(inheritedClusterRole.Rules)
+				}
+				expandedPolicyRules := ExpandPolicyRules(enumeratedPolicyRules)
+				rules = append(rules, expandedPolicyRules...)
+			case "Role":
+				if roleType == ClusterRole && roleToInherit.Namespace == "" {
+					return nil, errors.New("a Cluster Role cannot inherit from a Role without a namespace specified")
+				}
+				useNamespace := forNamespace
+				if roleToInherit.Namespace != "" {
+					useNamespace = roleToInherit.Namespace
+				}
+				inheritedRole := &v1.Role{}
+				roleNamespacedName := types.NamespacedName{Name: roleToInherit.Name, Namespace: useNamespace}
+				err := client.Get(context.TODO(), roleNamespacedName, inheritedRole)
+				if err != nil {
+					return nil, err
+				}
+				enumeratedPolicyRules, err := EnumeratePolicyRules(inheritedRole.Rules)
+				expandedPolicyRules := ExpandPolicyRules(enumeratedPolicyRules)
+				rules = append(rules, expandedPolicyRules...)
 			}
-			// nonResourceURLs do not make sense to move from a ClusterRole to a Role
-			enumeratedPolicyRules, err := EnumeratePolicyRules(StripNonResourceURLs(inheritedClusterRole.Rules))
-			expandedPolicyRules := ExpandPolicyRules(enumeratedPolicyRules)
-			rules = append(rules, expandedPolicyRules...)
-		case "Role":
-			inheritedRole := &v1.Role{}
-			roleNamespacedName := types.NamespacedName{Name: inherit.Name, Namespace: forNamespace}
-			err := client.Get(context.TODO(), roleNamespacedName, inheritedRole)
-			if err != nil {
-				return nil, err
-			}
-			enumeratedPolicyRules, err := EnumeratePolicyRules(StripNonResourceURLs(inheritedRole.Rules))
-			expandedPolicyRules := ExpandPolicyRules(enumeratedPolicyRules)
-			rules = append(rules, expandedPolicyRules...)
 		}
 	}
 

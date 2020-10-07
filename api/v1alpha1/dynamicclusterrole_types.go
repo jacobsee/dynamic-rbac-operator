@@ -24,46 +24,41 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// DynamicRoleSpec defines the desired state of DynamicRole
-type DynamicRoleSpec struct {
+// DynamicClusterRoleSpec defines the desired state of DynamicClusterRole
+type DynamicClusterRoleSpec struct {
 	Inherit *[]InheritedRole `json:"inherit,omitempty"`
 	Allow   *[]v1.PolicyRule `json:"allow,omitempty"`
 	Deny    *[]v1.PolicyRule `json:"deny,omitempty"`
 }
 
-type InheritedRole struct {
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-	Namespace string `json:"namespace"`
-}
-
-// DynamicRoleStatus defines the observed state of DynamicRole
-type DynamicRoleStatus struct {
+// DynamicClusterRoleStatus defines the observed state of DynamicClusterRole
+type DynamicClusterRoleStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster
 
-// DynamicRole is the Schema for the dynamicroles API
-type DynamicRole struct {
+// DynamicClusterRole is the Schema for the dynamicclusterroles API
+type DynamicClusterRole struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   DynamicRoleSpec   `json:"spec,omitempty"`
-	Status DynamicRoleStatus `json:"status,omitempty"`
+	Spec   DynamicClusterRoleSpec   `json:"spec,omitempty"`
+	Status DynamicClusterRoleStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// DynamicRoleList contains a list of DynamicRole
-type DynamicRoleList struct {
+// DynamicClusterRoleList contains a list of DynamicClusterRole
+type DynamicClusterRoleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []DynamicRole `json:"items"`
+	Items           []DynamicClusterRole `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&DynamicRole{}, &DynamicRoleList{})
+	SchemeBuilder.Register(&DynamicClusterRole{}, &DynamicClusterRoleList{})
 }

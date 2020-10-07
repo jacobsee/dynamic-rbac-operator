@@ -100,6 +100,18 @@ func (r *CustomResourceDefinitionReconciler) Reconcile(req ctrl.Request) (ctrl.R
 			return reconcile.Result{}, err
 		}
 	}
+	dynamicClusterRoleList := &rbacv1alpha1.DynamicClusterRoleList{}
+	err = r.Client.List(context.TODO(), dynamicClusterRoleList)
+	if err != nil {
+		r.Log.Error(err, "could not list Dynamic Cluster Roles")
+		return reconcile.Result{}, err
+	}
+	for _, dynamicClusterRole := range dynamicClusterRoleList.Items {
+		_, err := ReconcileDynamicClusterRole(&dynamicClusterRole, r.Client, r.Scheme, r.Log)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+	}
 	r.Log.Info("All computed roles have been reconciled")
 
 	return ctrl.Result{}, nil
