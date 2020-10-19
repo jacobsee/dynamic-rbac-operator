@@ -30,6 +30,4 @@ jobs:
           registry: quay.io
           repository: jacobsee/dynamic-rbac-operator
           push: true
-          tags: |
-            jacobsee/dynamic-rbac-operator:${{ github.sha }}
-            jacobsee/dynamic-rbac-operator:master
+          tags: "${{ github.sha }},master"

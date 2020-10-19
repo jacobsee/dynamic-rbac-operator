@@ -30,12 +30,10 @@ jobs:
         dockerfile: Dockerfile
         username: ${{ secrets.OPERATOR_REGISTRY_USERNAME }}
         password: ${{ secrets.OPERATOR_REGISTRY_PASSWORD }}
-        registry: ${{ secrets.OPERATOR_REGISTRY_SERVER }}
-        repository: ${{ secrets.OPERATOR_REGISTRY_REPOSITORY }}
+        registry: quay.io
+        repository: jacobsee/dynamic-rbac-operator
         push: true
-        tags: |
-          jacobsee/dynamic-rbac-operator:${{ github.sha }}
-          jacobsee/dynamic-rbac-operator:master
+        tags: "${{ github.sha }},master"
 
   release:
     runs-on: ubuntu-latest
@@ -45,7 +43,7 @@ jobs:
     - name: tag with release version
       uses: tinact/docker.image-retag@1.0.2
       with:
-        image_name: rht-labs/lodestar-backend
+        image_name: jacobsee/dynamic-rbac-operator
         image_old_tag: ${{ github.sha }}
         image_new_tag: ${{ github.event.release.tag_name }}
         registry: quay.io
@@ -54,7 +52,7 @@ jobs:
     - name: tag with latest
       uses: tinact/docker.image-retag@1.0.2
       with:
-        image_name: rht-labs/lodestar-backend
+        image_name: jacobsee/dynamic-rbac-operator
         image_old_tag: ${{ github.sha }}
         registry: quay.io
         registry_username: ${{ secrets.OPERATOR_REGISTRY_USERNAME }}
