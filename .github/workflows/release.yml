@@ -12,7 +12,7 @@ jobs:
       id: need_to_build
       run: |
         function image_exists() {
-            curl --silent -f -lSL https://quay.io/v1/repositories/jacobsee/dynamic-rbac-operator/tags/$1 > /dev/null
+            curl --silent -f -lSL https://quay.io/v1/repositories/redhat-cop/dynamic-rbac-operator/tags/$1 > /dev/null
         }
         if image_exists ${{ github.sha }}; then
             echo "Image exists - not building"
@@ -31,7 +31,7 @@ jobs:
         username: ${{ secrets.OPERATOR_REGISTRY_USERNAME }}
         password: ${{ secrets.OPERATOR_REGISTRY_PASSWORD }}
         registry: quay.io
-        repository: jacobsee/dynamic-rbac-operator
+        repository: redhat-cop/dynamic-rbac-operator
         push: true
         tags: "${{ github.sha }},master"
 
@@ -43,7 +43,7 @@ jobs:
     - name: tag with release version
       uses: tinact/docker.image-retag@1.0.2
       with:
-        image_name: jacobsee/dynamic-rbac-operator
+        image_name: redhat-cop/dynamic-rbac-operator
         image_old_tag: ${{ github.sha }}
         image_new_tag: ${{ github.event.release.tag_name }}
         registry: quay.io
@@ -52,7 +52,7 @@ jobs:
     - name: tag with latest
       uses: tinact/docker.image-retag@1.0.2
       with:
-        image_name: jacobsee/dynamic-rbac-operator
+        image_name: redhat-cop/dynamic-rbac-operator
         image_old_tag: ${{ github.sha }}
         registry: quay.io
         registry_username: ${{ secrets.OPERATOR_REGISTRY_USERNAME }}

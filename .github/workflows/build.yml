@@ -28,6 +28,6 @@ jobs:
           username: ${{ secrets.OPERATOR_REGISTRY_USERNAME }}
           password: ${{ secrets.OPERATOR_REGISTRY_PASSWORD }}
           registry: quay.io
-          repository: jacobsee/dynamic-rbac-operator
+          repository: redhat-cop/dynamic-rbac-operator
           push: true
           tags: "${{ github.sha }},master"

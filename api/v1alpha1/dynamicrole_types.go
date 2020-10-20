@@ -34,7 +34,7 @@ type DynamicRoleSpec struct {
 type InheritedRole struct {
 	Name      string `json:"name"`
 	Kind      string `json:"kind"`
-	Namespace string `json:"namespace"`
+	Namespace string `json:"namespace,omitempty"`
 }
 
 // DynamicRoleStatus defines the observed state of DynamicRole

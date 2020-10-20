@@ -44,9 +44,9 @@ spec:
   - rbac
   links:
   - name: Dynamic RBAC Operator
-    url: https://dynamic-rbac-operator.domain
+    url: https://github.com/redhat-cop/dynamic-rbac-operator
   maintainers:
-  - email: jacob.d.see@gmail.com
+  - email: jasee@redhat.com
     name: Jacob See
   maturity: alpha
   provider:

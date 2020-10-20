@@ -146,7 +146,6 @@ spec:
                 required:
                 - kind
                 - name
-                - namespace
                 type: object
               type: array
           type: object
