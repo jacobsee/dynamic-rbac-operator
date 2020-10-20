@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 
 	"github.com/go-logr/logr"
-	"github.com/redhat-cop/dynamic-rbac-operator/helpers"
 	crdv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,6 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	rbacv1alpha1 "github.com/redhat-cop/dynamic-rbac-operator/api/v1alpha1"
+	helpers "github.com/redhat-cop/dynamic-rbac-operator/helpers"
 )
 
 // CustomResourceDefinitionReconciler reconciles a CustomResourceDefinition object

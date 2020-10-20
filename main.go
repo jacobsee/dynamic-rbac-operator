@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	"github.com/redhat-cop/dynamic-rbac-operator/helpers"
+	helpers "github.com/redhat-cop/dynamic-rbac-operator/helpers"
 
 	crdv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 

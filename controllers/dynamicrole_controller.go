@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	rbacv1alpha1 "github.com/redhat-cop/dynamic-rbac-operator/api/v1alpha1"
-	"github.com/redhat-cop/dynamic-rbac-operator/helpers"
+	helpers "github.com/redhat-cop/dynamic-rbac-operator/helpers"
 )
 
 // DynamicRoleReconciler reconciles a DynamicRole object
